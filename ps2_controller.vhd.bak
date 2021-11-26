@@ -1,0 +1,35 @@
+LIBRARY ieee;
+USE ieee.std_logic_1164.all;
+
+
+entity ps2_controller is
+	generic (
+		RESET_ACTIVE : std_logic := '0'
+		)
+
+	port (
+		keycode 			: out std_logic_vector(7 downto 0);
+		data_received 	: out std_logic;
+		ps2_data			: in std_logic;
+		ps2_clk			: inout std_logic; -- The driver need to have an ability to pull this to low
+		reset 			: in std_logic;
+		clk 				: in std_logic)
+end ps2_controller;
+		
+		
+architecture behav of ps2_controller is
+	type ps2_state_t is (PS2_IDLE, PS2_START, PS2_DATA, PS2_PARITY, PS2_STOP);
+
+begin
+
+	ps2_read : process(ps2_clk, reset, clk) is
+		variable ps2_state : ps2_state_t := PS2_IDLE;
+		variable clock_ticks_passed : integer := 0;
+	begin
+		
+		if (reset = RESET_ACTIVE) then
+			keycode = (others <= '0');
+			data_received <= '0';
+		elsif (rising_edge(clk)) then
+			clock_ticks_passed += 
+		
