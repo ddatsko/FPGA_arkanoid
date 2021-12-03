@@ -287,14 +287,22 @@ begin
 				if (new_ball_y > PADDING_TOP and new_ball_y <= PADDING_TOP + BRICK_HEIGHT * ROWS_NUM) then
 					if (bricks((new_ball_y - PADDING_TOP) / BRICK_HEIGHT)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) = '1') then
 						bricks((new_ball_y - PADDING_TOP) / BRICK_HEIGHT)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) <= '0';
-						ball_movement_angle := 7 - ball_movement_angle;
+						
+						-- Chagne movement direction if it has not been changed before
+						if ball_movement_angle >= 4 then
+							ball_movement_angle := 7 - ball_movement_angle;
+						end if;
 					end if;
 				end if;
 					
 				if ((new_ball_y + BALL_LENGTH) > PADDING_TOP and (new_ball_y + BALL_LENGTH) <= PADDING_TOP + BRICK_HEIGHT * ROWS_NUM) then
 					if (bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) = '1') then
 						bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) <= '0';
-						ball_movement_angle := 7 - ball_movement_angle;
+						
+						-- Chagne movement direction if it has not been changed before
+						if ball_movement_angle >= 4 then
+							ball_movement_angle := 7 - ball_movement_angle;
+						end if;
 					end if;
 				end if;
 			
@@ -303,14 +311,22 @@ begin
 				if (new_ball_y > PADDING_TOP and new_ball_y <= PADDING_TOP + BRICK_HEIGHT * ROWS_NUM) then
 					if (bricks((new_ball_y - PADDING_TOP) / BRICK_HEIGHT)(new_ball_x / BRICK_WIDTH) = '1') then
 						bricks((new_ball_y - PADDING_TOP) / BRICK_HEIGHT)(new_ball_x / BRICK_WIDTH) <= '0';
-						ball_movement_angle := 7 - ball_movement_angle;
+						
+						-- Chagne movement direction if it has not been changed before
+						if ball_movement_angle <= 3 then
+							ball_movement_angle := 7 - ball_movement_angle;
+						end if;
 					end if;
 				end if;
 					
 				if ((new_ball_y + BALL_LENGTH) > PADDING_TOP and new_ball_y <= PADDING_TOP + BRICK_HEIGHT * ROWS_NUM) then
 					if (bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)(new_ball_x / BRICK_WIDTH) = '1') then
 						bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)(new_ball_x / BRICK_WIDTH) <= '0';
-						ball_movement_angle := 7 - ball_movement_angle;
+						
+						-- Chagne movement direction if it has not been changed before
+						if ball_movement_angle <= 3 then
+							ball_movement_angle := 7 - ball_movement_angle;
+						end if;
 					end if;
 				end if;
 		end if;
