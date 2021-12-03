@@ -11,12 +11,12 @@ entity arkanoid is
 		SCREEN_WIDTH 		    : integer := 800;
 		SCREEN_HEIGHT 		    : integer := 600;
 		PLATFORM_WIDTH		    : integer := 100;
-		PLATFORM_HEIGHT 	    : integer := 20;
+		PLATFORM_HEIGHT 	    : integer := 10;
 		BALL_LENGTH			    : integer := 6;
-		ONE_MOVE_CLOCK_TICKS  : integer := 400000;
-		ROWS_NUM 				 : integer := 5;
-		BRICK_WIDTH			 	 : integer := 50;
-		BRICKS_IN_A_ROW 		 : integer := 16;
+		ONE_MOVE_CLOCK_TICKS  : integer := 100000;
+		ROWS_NUM 				 : integer := 5; -- 5
+		BRICK_WIDTH			 	 : integer := 50; --50
+		BRICKS_IN_A_ROW 		 : integer := 16; -- 16
 		BRICK_HEIGHT 			 : integer := 20;
 		PADDING_TOP				 : integer := 20;
 		PLATFORM_Y				 : integer := 550);
@@ -43,21 +43,15 @@ end arkanoid;
 architecture behav of arkanoid is
 
 type key_pressed_t is (KEY_UP, KEY_RIGHT, KEY_DOWN, KEY_LEFT, KEY_NONE);
-type color_row is array(1 to SCREEN_WIDTH) of std_logic_vector(7 downto 0);
 
-type bricks_arr is array(1 to ROWS_NUM) of bit_vector(1 to BRICKS_IN_A_ROW);
+type bricks_arr is array(0 to ROWS_NUM - 1) of bit_vector(0 to BRICKS_IN_A_ROW - 1);
 type color_t is array(1 to 3) of std_logic_vector(7 downto 0);
 
 -- objects positions
 signal ball_x : integer := SCREEN_WIDTH / 2;
 signal ball_y : integer := SCREEN_HEIGHT / 2;
 signal platform_x : integer := SCREEN_WIDTH / 2 - PLATFORM_WIDTH / 2 + 1;
-signal bricks : bricks_arr;
-
---Signals for storing the next row to be drawn
-signal row_red : color_row;
-signal row_green : color_row; 
-signal row_blue : color_row; 
+signal bricks : bricks_arr := (others => (others => '1'));
 
 signal buttons_pressed  : std_logic_vector(3 downto 0) := "0000"; -- one bit per button (WASD)
 
@@ -88,69 +82,36 @@ end function;
 
 
 begin
-   red <= row_red(conv_integer(col)) when col <= SCREEN_WIDTH and display_enabled = '1' else "00000000";
-   green <= row_green(conv_integer(col)) when col <= SCREEN_WIDTH and display_enabled = '1' else "00000000";
-   blue <= row_blue(conv_integer(col)) when col <= SCREEN_WIDTH and display_enabled = '1' else "00000000";
 
+
+
+
+	red <= "00000000" when reset = RESET_ACTIVE or col > SCREEN_WIDTH or row > SCREEN_HEIGHT else
+			 BALL_COLOR(1) 			when row > ball_y and row < ball_y + BALL_LENGTH and col > ball_x and col < ball_x + BALL_LENGTH else
+			 PLATFORM_COLOR(1) 		when row > PLATFORM_Y and row < PLATFORM_Y + PLATFORM_HEIGHT and col > platform_x and col < platform_x + plaTFORM_WIDTH else
+			 BRICK_COLOR(1) 			when row > PADDING_TOP and row < (PADDING_TOP + ROWS_NUM * BRICK_HEIGHT) and not ((conv_integer(row) - PADDING_TOP) mod BRICK_HEIGHT = 0 or (conv_integer(row) - PADDING_TOP) mod BRICK_HEIGHT = BRICK_HEIGHT - 1 or 
+						(conv_integer(col) mod BRICK_WIDTH = 0 or conv_integer(col) mod BRICK_WIDTH = BRICK_WIDTH - 1)) and 
+						bricks((conv_integer(row) - PADDING_TOP) / BRICK_HEIGHT)(conv_integer(col) / BRICK_WIDTH) = '1' else
+			 BACKGROUND_COLOR(1);
+			 
+	green <= "00000000" when reset = RESET_ACTIVE or col > SCREEN_WIDTH or row > SCREEN_HEIGHT else
+			 BALL_COLOR(2) 			when row > ball_y and row < ball_y + BALL_LENGTH and col > ball_x and col < ball_x + BALL_LENGTH else
+			 PLATFORM_COLOR(2) 		when row > PLATFORM_Y and row < PLATFORM_Y + PLATFORM_HEIGHT and col > platform_x and col < platform_x + plaTFORM_WIDTH else
+			 BRICK_COLOR(2) 			when row > PADDING_TOP and row < (PADDING_TOP + ROWS_NUM * BRICK_HEIGHT) and not ((conv_integer(row) - PADDING_TOP) mod BRICK_HEIGHT = 0 or (conv_integer(row) - PADDING_TOP) mod BRICK_HEIGHT = BRICK_HEIGHT - 1 or 
+						(conv_integer(col) mod BRICK_WIDTH = 0 or conv_integer(col) mod BRICK_WIDTH = BRICK_WIDTH - 1)) and 
+						bricks((conv_integer(row) - PADDING_TOP) / BRICK_HEIGHT)(conv_integer(col) / BRICK_WIDTH) = '1' else
+			 BACKGROUND_COLOR(2);
+
+			 
+	blue <= "00000000" when reset = RESET_ACTIVE or col > SCREEN_WIDTH or row > SCREEN_HEIGHT else
+			 BALL_COLOR(3) 			when row > ball_y and row < ball_y + BALL_LENGTH and col > ball_x and col < ball_x + BALL_LENGTH else
+			 PLATFORM_COLOR(3) 		when row > PLATFORM_Y and row < PLATFORM_Y + PLATFORM_HEIGHT and col > platform_x and col < platform_x + plaTFORM_WIDTH else
+			 BRICK_COLOR(3) 			when row > PADDING_TOP and row < (PADDING_TOP + ROWS_NUM * BRICK_HEIGHT) and not ((conv_integer(row) - PADDING_TOP) mod BRICK_HEIGHT = 0 or (conv_integer(row) - PADDING_TOP) mod BRICK_HEIGHT = BRICK_HEIGHT - 1 or 
+						(conv_integer(col) mod BRICK_WIDTH = 0 or conv_integer(col) mod BRICK_WIDTH = BRICK_WIDTH - 1)) and 
+						bricks((conv_integer(row) - PADDING_TOP) / BRICK_HEIGHT)(conv_integer(col) / BRICK_WIDTH) = '1' else
+			 BACKGROUND_COLOR(3);
 	
-	screen_output_generator : process (clock, reset) is
-		variable last_row_generated : integer := -1;
-	begin
-		
-		if (reset = RESET_ACTIVE) then
-			row_red <= (others => "00000000");
-			row_green <= (others => "00000000");
-			row_blue <= (others => "00000000");
-		
-		-- Need not regenerate the row if the current one is already generated or blanking time and the next one is already generated
-		elsif (not ((last_row_generated = conv_integer(row)) or (last_row_generated = conv_integer(row) + 1 and conv_integer(col) > SCREEN_WIDTH))) then
-			-- Regenerate each color for the next row during blanking time
-			last_row_generated := conv_integer(row) + 1;
---			if (last_row_generated <= PADDING_TOP or last_row_generated > PADDING_TOP + ROWS_NUM * brick_HEIGHT) then
 
-			if (last_row_generated >= PLATFORM_Y and last_row_generated < PLATFORM_Y + PLATFORM_HEIGHT) then
-				-- Show the platform
-				-- TODO: remove this shitty loop. (issues)
-				for i in 1 to SCREEN_WIDTH loop
-					if (i < platform_x or i >= platform_x + PLATFORM_WIDTH) then
-						row_red(i) <= BACKGROUND_COLOR(1);
-						row_green(i) <= BACKGROUND_COLOR(2);
-						row_blue(i) <= BACKGROUND_COLOR(3);
-					else
-						row_red(i) <= PLATFORM_COLOR(1);
-						row_green(i) <= PLATFORM_COLOR(2);
-						row_blue(i) <= PLATFORM_COLOR(3);
-					end if;
-				end loop;
-				
-				--row_green <= (platform_x to platform_x + PLATFORM_WIDTH - 1 => PLATFORM_COLOR(2), others => BACKGROUND_COLOR(2));
-				--row_blue <= (platform_x to platform_x + PLATFORM_WIDTH - 1 => PLATFORM_COLOR(3), others => BACKGROUND_COLOR(3));
-			end if;
-			
-			if (last_row_generated > PADDING_TOP and last_row_generated <= PADDING_TOP + ROWS_NUM * BRICK_HEIGHT) then
-				if ((last_row_generated - PADDING_TOP) mod BRICK_HEIGHT = 1 or (last_row_generated - PADDING_TOP) mod BRICK_HEIGHT = BRICK_HEIGHT - 1) then
-					-- Border of the brick. Draw with black color to make visual difference between bricks
-					row_red <= (others => "00000000");
-					row_green <= (others => "00000000");
-					row_blue <= (others => "00000000");
-				else
-					for i in 0 to (BRICKS_IN_A_ROW - 1) loop
-						row_red(i * BRICK_WIDTH + 1 to (i + 1) * BRICK_WIDTH) <= (i * BRICK_WIDTH + 1 => "00000000", i * BRICK_WIDTH + 2 to (i + 1) * BRICK_WIDTH - 1 => BRICK_COLOR(1), (i + 1) * BRICK_WIDTH => "00000000");
-						row_green(i * BRICK_WIDTH + 1 to (i + 1) * BRICK_WIDTH) <= (i * BRICK_WIDTH + 1 => "00000000", i * BRICK_WIDTH + 2 to (i + 1) * BRICK_WIDTH - 1 => BRICK_COLOR(2), (i + 1) * BRICK_WIDTH => "00000000");
-						row_blue(i * BRICK_WIDTH + 1 to (i + 1) * BRICK_WIDTH) <= (i * BRICK_WIDTH + 1 => "00000000", i * BRICK_WIDTH + 2 to (i + 1) * BRICK_WIDTH - 1 => BRICK_COLOR(3), (i + 1) * BRICK_WIDTH => "00000000");
-					end loop;
-				end if;
-			end if;
-			
-			if (last_row_generated >= ball_x and last_row_generated < ball_x + BALL_LENGTH) then
-				-- Draw the ball (on top of everything drawn before)
-				row_red(max(ball_x, 1) to min(ball_x + BALL_LENGTH - 1, SCREEN_WIDTH)) <= (others => BALL_COLOR(1));
-				row_green(max(ball_x, 1) to min(ball_x + BALL_LENGTH - 1, SCREEN_WIDTH)) <= (others => BALL_COLOR(2));
-				row_blue(max(ball_x, 1) to min(ball_x + BALL_LENGTH - 1, SCREEN_WIDTH)) <= (others => BALL_COLOR(2));		
-			end if;
-		
-		end if;
-	end process;
 	
 	-- Porcess for generatinf the AUX clock
 	move_clock_generator : process (clock, reset) is
@@ -170,32 +131,204 @@ begin
 	
  
 	-- Main process for processing movement of the shaped on the screen
-	process_game : process(move_clock, reset) is
+process_game : process(move_clock, reset) is
+
+	type movement_t is record
+		d_x : integer;
+		d_y : integer;
+	end record;
+	
+	type angles_array_t is array(0 to 7) of movement_t;
+	
+	type two_d_index is record
+		row : integer;
+		col : integer;
+	end record;
+	
+	-- Constant for calculating different move angles of the ball
+	constant move_angles_up : angles_array_t := ((d_x => -939, d_y => -342),
+	(d_x => -766, d_y => -642),
+	(d_x => -500, d_y => -866),
+	(d_x => -173, d_y => -984),
+	(d_x => 173, d_y => -984),
+	(d_x => 499, d_y => -866),
+	(d_x => 766, d_y => -642),
+	(d_x => 939, d_y => -342));
+
+
+	constant move_angles_down : angles_array_t := ((d_x => -939, d_y => 342),
+	(d_x => -766, d_y => 642),
+	(d_x => -500, d_y => 866),
+	(d_x => -173, d_y => 984),
+	(d_x => 173, d_y => 984),
+	(d_x => 499, d_y => 866),
+	(d_x => 766, d_y => 642),
+	(d_x => 939, d_y => 342));
+
+	variable ball_x_real : integer := SCREEN_WIDTH / 2 * 1000;
+	variable ball_y_real : integer := SCREEN_HEIGHT / 2 * 1000;
+	variable new_ball_x, new_ball_y : integer;
+	variable ball_moving_down : boolean := true;
+	variable ball_movement_angle : integer range 1 to 8 := 3;
+	variable intersecting_brick : two_d_index;
+
+begin
+	led_r (4 downto 0) <= To_StdLogicVector(bricks(1));
+
+	if (reset = RESET_ACTIVE) then
+		ball_x <= SCREEN_WIDTH / 2;
+		ball_y <= SCREEN_HEIGHT / 2;
+		ball_x_real := SCREEN_WIDTH / 2 * 1000;
+		ball_y_real := SCREEN_HEIGHT / 2 * 1000;
 		
-		-- TODO: change these to some big integers
---		variable real_ball_x : real := 0.0;
---		variable real_ball_y : real := 0.0;
-	begin
-		if (reset = RESET_ACTIVE) then
-			ball_x <= SCREEN_WIDTH / 2;
-			ball_y <= SCREEN_HEIGHT / 2;
-			
-		elsif (rising_edge(move_clock)) then
-			-- firstly, move the platform
-			if (buttons_pressed(2) = '1' and buttons_pressed(0) = '0') then
-				-- A is pressed, so move the platform to the left
-				platform_x <= platform_x - 1;
-			elsif (buttons_pressed(0) = '1' and buttons_pressed(2) = '0') then
-				-- D is pressed, so move the platform to the right
-				platform_x <= platform_x + 1;
+		
+		ball_movement_angle := 3;
+		ball_moving_down := true;
+		bricks <= (others => (others => '1'));
+		
+--		for i in bricks'range loop
+--			for j in bricks(i)'range loop
+--				bricks(i)(j) <= '1';
+--			end loop;
+--		end loop;
+
+	elsif (rising_edge(move_clock)) then
+		-- firstly, move the platform
+		if (buttons_pressed(2) = '1' and buttons_pressed(0) = '0' and platform_x > 0) then
+			-- A is pressed, so move the platform to the left
+			platform_x <= platform_x - 1;
+		elsif (buttons_pressed(0) = '1' and buttons_pressed(2) = '0' and platform_x + PLATFORM_WIDTH < SCREEN_WIDTH - 1) then
+			-- D is pressed, so move the platform to the right
+			platform_x <= platform_x + 1;
+		end if;
+
+		-- Then, move the ball to its movement direction
+		if (ball_moving_down) then
+			ball_x_real := ball_x_real + move_angles_down(ball_movement_angle).d_x;
+			ball_y_real := ball_y_real + move_angles_down(ball_movement_angle).d_y;
+		else
+			ball_x_real := ball_x_real + move_angles_up(ball_movement_angle).d_x;
+			ball_y_real := ball_y_real + move_angles_up(ball_movement_angle).d_y;
+		end if;
+
+		-- Find the new position of the ball one the screen
+		new_ball_x := ball_x_real / 1000;
+		new_ball_y := ball_y_real / 1000;
+
+		-- Process collision with the left wall
+		if (new_ball_x < 1) then
+			new_ball_x := -new_ball_x + 1;
+			ball_movement_angle := 7 - ball_movement_angle;
+		end if;
+
+		-- Process collosion with the right wall
+		if (new_ball_x + BALL_LENGTH > SCREEN_WIDTH) then
+			new_ball_x := SCREEN_WIDTH - (new_ball_x + BALL_LENGTH - SCREEN_WIDTH);
+			ball_movement_angle := 7 - ball_movement_angle;
+		end if;
+
+		-- Process collision with the top wall
+		if (new_ball_y < 1) then
+			new_ball_y := -new_ball_y + 1;
+			ball_moving_down := true;
+		end if;
+
+		-- Process collision with the bottom wall
+		if (new_ball_y + BALL_LENGTH > SCREEN_HEIGHT) then
+			-- The ball is lost. Put it back to the center of the screen
+			ball_x_real := SCREEN_WIDTH / 2 * 1000;
+			ball_y_real := SCREEN_HEIGHT / 2 * 1000;
+			new_ball_x := SCREEN_WIDTH / 2;
+			new_ball_y := SCREEN_HEIGHT / 2;
+			ball_movement_angle := 3;
+		end if;
+
+		-- Process collision with the platform
+		if (new_ball_y + BALL_LENGTH >= PLATFORM_Y and new_ball_y < PLATFORM_Y + PLATFORM_HEIGHT and ball_moving_down) then
+		-- Ball is at least at the same height as the platform is
+			if (ball_x <= platform_x + PLATFORM_WIDTH and ball_x + BALL_LENGTH > platform_x) then
+				-- Ball touches the platform
+				ball_moving_down := false;
+				-- Change ball movement angle depending on the side of the platform that was hit
+				ball_movement_angle := (new_ball_x + BALL_LENGTH - platform_x + 2) * 8 / (PLATFORM_WIDTH + BALL_LENGTH);
+			end if;
+		end if;
+
+		
+		-- Process collision with bricks
+		-- TODO: implement this without copy pasting the code
+		
+		-- Process ball moving up
+		if (ball_moving_down = false and new_ball_y >= PADDING_TOP + BRICK_HEIGHT and new_ball_y <= PADDING_TOP + (BRICK_HEIGHT * ROWS_NUM)) then
+			if ((new_ball_y - PADDING_TOP) mod BRICK_HEIGHT = 0) then
+				if (bricks((new_ball_y - PADDING_TOP) / BRICK_HEIGHT - 1)(new_ball_x / BRICK_WIDTH) = '1') then
+					bricks((new_ball_y - PADDING_TOP) / BRICK_HEIGHT - 1)(new_ball_x / BRICK_WIDTH) <= '0';
+					ball_moving_down := true;
+				elsif (bricks((new_ball_y - PADDING_TOP) / BRICK_HEIGHT - 1)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) = '1') then
+					bricks((new_ball_y - PADDING_TOP) / BRICK_HEIGHT - 1)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) <= '0';
+					ball_moving_down := true;
+				end if;
 			end if;
 			
-			
-			
-			
-			
+		-- Process ball moving down
+		elsif (ball_moving_down and new_ball_y + BALL_LENGTH >= PADDING_TOP + 1 and new_ball_y + BALL_LENGTH <= PADDING_TOP + (BRICK_HEIGHT * (ROWS_NUM - 1)) + 1) then
+			if ((new_ball_y - PADDING_TOP) mod BRICK_HEIGHT = 1) then
+				if (bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)(new_ball_x / BRICK_WIDTH) = '1') then
+					bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)(new_ball_x / BRICK_WIDTH) <= '0';
+					ball_moving_down := false;
+				end if;
+				if (bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) = '1') then
+					bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) <= '0';
+					ball_moving_down := false;
+				end if;
+			end if;
 		end if;
-	end process;
+		
+		-- Process ball moving right
+		if (ball_movement_angle >= 4 and (new_ball_x + BALL_LENGTH) mod BRICK_WIDTH = 0) then
+				if (new_ball_y > PADDING_TOP and new_ball_y <= PADDING_TOP + BRICK_HEIGHT * ROWS_NUM) then
+					if (bricks((new_ball_y - PADDING_TOP) / BRICK_HEIGHT)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) = '1') then
+						bricks((new_ball_y - PADDING_TOP) / BRICK_HEIGHT)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) <= '0';
+						ball_movement_angle := 7 - ball_movement_angle;
+					end if;
+				end if;
+					
+				if ((new_ball_y + BALL_LENGTH) > PADDING_TOP and (new_ball_y + BALL_LENGTH) <= PADDING_TOP + BRICK_HEIGHT * ROWS_NUM) then
+					if (bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) = '1') then
+						bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) <= '0';
+						ball_movement_angle := 7 - ball_movement_angle;
+					end if;
+				end if;
+			
+		-- Process ball moving left
+		elsif (ball_movement_angle <= 3 and new_ball_x mod BRICK_WIDTH = BRICK_WIDTH - 1) then
+				if (new_ball_y > PADDING_TOP and new_ball_y <= PADDING_TOP + BRICK_HEIGHT * ROWS_NUM) then
+					if (bricks((new_ball_y - PADDING_TOP) / BRICK_HEIGHT)(new_ball_x / BRICK_WIDTH) = '1') then
+						bricks((new_ball_y - PADDING_TOP) / BRICK_HEIGHT)(new_ball_x / BRICK_WIDTH) <= '0';
+						ball_movement_angle := 7 - ball_movement_angle;
+					end if;
+				end if;
+					
+				if ((new_ball_y + BALL_LENGTH) > PADDING_TOP and new_ball_y <= PADDING_TOP + BRICK_HEIGHT * ROWS_NUM) then
+					if (bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)(new_ball_x / BRICK_WIDTH) = '1') then
+						bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)(new_ball_x / BRICK_WIDTH) <= '0';
+						ball_movement_angle := 7 - ball_movement_angle;
+					end if;
+				end if;
+		end if;
+
+
+		ball_x <= new_ball_x;
+		ball_y <= new_ball_y;
+
+	end if;
+end process;
+	
+	
+	
+	
+	
+	
  
  
 	read_keycode : process(clock) is
@@ -212,7 +345,6 @@ begin
 	begin
 		if (rising_edge(clock)) then
 			if ((prev_key_received /= ps2_key_received) and (ps2_key_received = '1')) then
-				led_r(7 downto 0) <= ps2_keycode;
 				
 				-- Simply skip the extension keyode as we dont use it at all
 				if (ps2_keycode /= extension_keycode) then
