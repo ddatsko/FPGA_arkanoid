@@ -173,8 +173,6 @@ process_game : process(move_clock, reset) is
 	variable intersecting_brick : two_d_index;
 
 begin
-	led_r (4 downto 0) <= To_StdLogicVector(bricks(1));
-
 	if (reset = RESET_ACTIVE) then
 		ball_x <= SCREEN_WIDTH / 2;
 		ball_y <= SCREEN_HEIGHT / 2;
@@ -326,10 +324,7 @@ end process;
 	
 	
 	
-	
-	
-	
- 
+
  
 	read_keycode : process(clock) is
 		variable release_keycode_received 	: boolean := false;
