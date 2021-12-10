@@ -63,9 +63,9 @@ architecture behav of arkanoid is
 
 
 	constant PLATFORM_COLOR : color_t := ("00111111", "00111111", "01111111");
-	constant BALL_COLOR : color_t := ("01111111", "00000000", "00000000");
+	constant BALL_COLOR : color_t := ("11111111", "00001111", "00001111");
 	constant BRICK_COLOR : color_t := ("00001111", "00000111", "01111111");
-	constant BACKGROUND_COLOR : color_t := ("00001111", "00000000", "00001111");
+	constant BACKGROUND_COLOR : color_t := ("00001111", "00011111", "00001111");
 
 
 begin
@@ -258,7 +258,7 @@ begin
 			end if;
 			
 			-- Process ball moving right
-			if (ball_movement_angle >= 4 and (new_ball_x + BALL_LENGTH) mod BRICK_WIDTH = 0) then
+			if (ball_movement_angle >= 4 and (new_ball_x + BALL_LENGTH) mod BRICK_WIDTH = 0 and (new_ball_x + BALL_LENGTH) < SCREEN_WIDTH) then
 					if (new_ball_y > PADDING_TOP and new_ball_y <= PADDING_TOP + BRICK_HEIGHT * ROWS_NUM) then
 						if (bricks((new_ball_y - PADDING_TOP) / BRICK_HEIGHT)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) = '1') then
 							bricks((new_ball_y - PADDING_TOP) / BRICK_HEIGHT)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) <= '0';
@@ -269,9 +269,7 @@ begin
 								ball_movement_angle := 7 - ball_movement_angle;
 							end if;
 						end if;
-					end if;
-						
-					if ((new_ball_y + BALL_LENGTH) > PADDING_TOP and (new_ball_y + BALL_LENGTH) <= PADDING_TOP + BRICK_HEIGHT * ROWS_NUM) then
+					elsif ((new_ball_y + BALL_LENGTH) > PADDING_TOP and (new_ball_y + BALL_LENGTH) <= PADDING_TOP + BRICK_HEIGHT * ROWS_NUM) then
 						if (bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) = '1') then
 							bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)((new_ball_x + BALL_LENGTH) / BRICK_WIDTH) <= '0';
 							game_score := game_score + 10;
@@ -293,9 +291,7 @@ begin
 								ball_movement_angle := 7 - ball_movement_angle;
 							end if;
 						end if;
-					end if;
-						
-					if ((new_ball_y + BALL_LENGTH) > PADDING_TOP and new_ball_y <= PADDING_TOP + BRICK_HEIGHT * ROWS_NUM) then
+					elsif ((new_ball_y + BALL_LENGTH) > PADDING_TOP and new_ball_y <= PADDING_TOP + BRICK_HEIGHT * ROWS_NUM) then
 						if (bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)(new_ball_x / BRICK_WIDTH) = '1') then
 							bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)(new_ball_x / BRICK_WIDTH) <= '0';
 							game_score := game_score + 10;

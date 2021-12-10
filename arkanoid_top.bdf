@@ -56,7 +56,7 @@ https://fpgasoftware.intel.com/eula.
 )
 (pin
 	(input)
-	(rect 472 496 640 512)
+	(rect 472 504 640 520)
 	(text "INPUT" (rect 125 0 153 10)(font "Arial" (font_size 6)))
 	(text "PS2_DAT" (rect 5 0 52 12)(font "Arial" ))
 	(pt 168 8)
@@ -69,7 +69,7 @@ https://fpgasoftware.intel.com/eula.
 		(line (pt 109 12)(pt 113 8))
 	)
 	(text "VCC" (rect 128 7 148 17)(font "Arial" (font_size 6)))
-	(annotation_block (location)(rect 392 488 464 512))
+	(annotation_block (location)(rect 400 520 472 544))
 )
 (pin
 	(input)
@@ -250,7 +250,7 @@ https://fpgasoftware.intel.com/eula.
 	(output)
 	(rect 168 480 344 496)
 	(text "OUTPUT" (rect 1 0 39 10)(font "Arial" (font_size 6)))
-	(text "HEX3[27..0]" (rect 90 0 145 17)(font "Intel Clear" ))
+	(text "HEX[27..0]" (rect 90 0 139 17)(font "Intel Clear" ))
 	(pt 0 8)
 	(drawing
 		(line (pt 0 8)(pt 52 8))
@@ -699,7 +699,7 @@ https://fpgasoftware.intel.com/eula.
 		(type "PARAMETER_SIGNED_DEC")	)
 	(parameter
 		"ROWS_NUM"
-		"5"
+		"6"
 		""
 		(type "PARAMETER_SIGNED_DEC")	)
 	(parameter
@@ -730,7 +730,7 @@ https://fpgasoftware.intel.com/eula.
 	(drawing
 		(rectangle (rect 16 16 208 160))
 	)
-	(annotation_block (parameter)(rect 712 184 904 224))
+	(annotation_block (parameter)(rect 712 184 968 224))
 )
 (connector
 	(text "CLK_40MHZ" (rect 1058 56 1118 73)(font "Intel Clear" ))
@@ -841,16 +841,24 @@ https://fpgasoftware.intel.com/eula.
 	(pt 656 544)
 )
 (connector
+	(pt 656 512)
+	(pt 640 512)
+)
+(connector
 	(text "PS2_KEYCODE[7..0]" (rect 866 496 962 513)(font "Intel Clear" ))
 	(pt 848 512)
 	(pt 992 512)
 	(bus)
 )
 (connector
-	(text "GAME_SCORE[31..0]" (rect 826 288 925 305)(font "Intel Clear" ))
-	(pt 816 304)
-	(pt 912 304)
-	(bus)
+	(text "RESET_N" (rect 586 512 629 529)(font "Intel Clear" ))
+	(pt 656 528)
+	(pt 576 528)
+)
+(connector
+	(text "PS2_KEYCODE_RECEIVED" (rect 986 512 1113 529)(font "Intel Clear" ))
+	(pt 1104 528)
+	(pt 848 528)
 )
 (connector
 	(text "RESET_N" (rect -126 488 -83 505)(font "Intel Clear" ))
@@ -884,25 +892,9 @@ https://fpgasoftware.intel.com/eula.
 	(pt 200 72)
 )
 (connector
-	(text "PS2_KEYCODE_RECEIVED" (rect 874 512 1001 529)(font "Intel Clear" ))
-	(pt 848 528)
-	(pt 992 528)
-)
-(connector
-	(text "RESET_N" (rect 586 512 629 529)(font "Intel Clear" ))
-	(pt 536 528)
-	(pt 656 528)
-)
-(connector
-	(pt 656 512)
-	(pt 648 512)
-)
-(connector
-	(pt 648 512)
-	(pt 648 504)
-)
-(connector
-	(pt 648 504)
-	(pt 640 504)
+	(text "GAME_SCORE[31..0]" (rect 842 288 941 305)(font "Intel Clear" ))
+	(pt 816 304)
+	(pt 928 304)
+	(bus)
 )
 (junction (pt 824 112))
