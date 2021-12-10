@@ -1,0 +1,37 @@
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
+
+
+
+entity 7seg_driver is
+
+  port (
+
+    clock  : in std_logic;
+    reset  : in std_logic;
+    button : in std_logic_vector(2 downto 0);
+    number : in integer;
+    led_r  : out std_logic_vector(9 downto 0);
+    hex    : out std_logic_vector(27 downto 0));
+
+end test_entity;
+
+
+
+architecture behav of test_entity is
+
+  type lut is array (natural range <>) of std_logic_vector(6 downto 0); -- type: unconstrained array of 7-bit words
+
+
+
+  -- constant - look-up table contains the 7-segment codes for numbers 0 to 7
+
+  constant MY_LUT : lut := ("1000000","1111001","0100100","0110000","0011001","0010010","0000010", "1111000", 
+
+									 "0000000", "0010000", "0001000", "0000011", "1000110", "0100001", "0000110", "0001110");
+
+
+
+begin

@@ -21,7 +21,7 @@ https://fpgasoftware.intel.com/eula.
 */
 (header "symbol" (version "1.1"))
 (symbol
-	(rect 16 16 232 192)
+	(rect 16 16 240 192)
 	(text "arkanoid" (rect 5 0 38 12)(font "Arial" ))
 	(text "inst" (rect 8 160 20 172)(font "Arial" ))
 	(port
@@ -74,40 +74,100 @@ https://fpgasoftware.intel.com/eula.
 		(line (pt 0 128)(pt 16 128)(line_width 1))
 	)
 	(port
-		(pt 216 32)
+		(pt 224 32)
 		(output)
 		(text "red[7..0]" (rect 0 0 33 12)(font "Arial" ))
-		(text "red[7..0]" (rect 162 27 195 39)(font "Arial" ))
-		(line (pt 216 32)(pt 200 32)(line_width 3))
+		(text "red[7..0]" (rect 170 27 203 39)(font "Arial" ))
+		(line (pt 224 32)(pt 208 32)(line_width 3))
 	)
 	(port
-		(pt 216 48)
+		(pt 224 48)
 		(output)
 		(text "green[7..0]" (rect 0 0 42 12)(font "Arial" ))
-		(text "green[7..0]" (rect 153 43 195 55)(font "Arial" ))
-		(line (pt 216 48)(pt 200 48)(line_width 3))
+		(text "green[7..0]" (rect 161 43 203 55)(font "Arial" ))
+		(line (pt 224 48)(pt 208 48)(line_width 3))
 	)
 	(port
-		(pt 216 64)
+		(pt 224 64)
 		(output)
 		(text "blue[7..0]" (rect 0 0 35 12)(font "Arial" ))
-		(text "blue[7..0]" (rect 160 59 195 71)(font "Arial" ))
-		(line (pt 216 64)(pt 200 64)(line_width 3))
+		(text "blue[7..0]" (rect 168 59 203 71)(font "Arial" ))
+		(line (pt 224 64)(pt 208 64)(line_width 3))
 	)
 	(port
-		(pt 216 80)
+		(pt 224 80)
 		(output)
-		(text "led_r[9..0]" (rect 0 0 40 12)(font "Arial" ))
-		(text "led_r[9..0]" (rect 155 75 195 87)(font "Arial" ))
-		(line (pt 216 80)(pt 200 80)(line_width 3))
+		(text "score[31..0]" (rect 0 0 46 12)(font "Arial" ))
+		(text "score[31..0]" (rect 157 75 203 87)(font "Arial" ))
+		(line (pt 224 80)(pt 208 80)(line_width 3))
 	)
 	(parameter
 		"RESET_ACTIVE"
-		"'1'"
+		"'0'"
 		""
 		(type "PARAMETER_ENUM")	)
+	(parameter
+		"SCREEN_WIDTH"
+		"800"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"SCREEN_HEIGHT"
+		"600"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"PLATFORM_WIDTH"
+		"100"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"PLATFORM_HEIGHT"
+		"10"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"BALL_LENGTH"
+		"6"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"ONE_MOVE_CLOCK_TICKS"
+		"100000"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"ROWS_NUM"
+		"5"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"BRICK_WIDTH"
+		"50"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"BRICKS_IN_A_ROW"
+		"16"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"BRICK_HEIGHT"
+		"20"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"PADDING_TOP"
+		"20"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
+	(parameter
+		"PLATFORM_Y"
+		"550"
+		""
+		(type "PARAMETER_SIGNED_DEC")	)
 	(drawing
-		(rectangle (rect 16 16 200 160)(line_width 1))
+		(rectangle (rect 16 16 208 160)(line_width 1))
 	)
-	(annotation_block (parameter)(rect 232 -64 332 16))
+	(annotation_block (parameter)(rect 240 -64 340 16))
 )
