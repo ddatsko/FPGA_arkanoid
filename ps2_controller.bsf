@@ -60,13 +60,6 @@ https://fpgasoftware.intel.com/eula.
 		(line (pt 192 48)(pt 176 48)(line_width 1))
 	)
 	(port
-		(pt 192 80)
-		(output)
-		(text "led_r[9..0]" (rect 0 0 40 12)(font "Arial" ))
-		(text "led_r[9..0]" (rect 131 75 171 87)(font "Arial" ))
-		(line (pt 192 80)(pt 176 80)(line_width 3))
-	)
-	(port
 		(pt 192 64)
 		(bidir)
 		(text "ps2_clk" (rect 0 0 30 12)(font "Arial" ))

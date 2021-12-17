@@ -13,8 +13,7 @@ entity ps2_controller is
 		ps2_data			: in std_logic;
 		ps2_clk			: inout std_logic; -- The driver need to have an ability to pull this to low
 		reset 			: in std_logic;
-		clk 				: in std_logic;
-		led_r				: out std_logic_vector(9 downto 0) -- For debug only
+		clk 				: in std_logic
 		);
 end ps2_controller;
 		
@@ -40,7 +39,6 @@ architecture behav of ps2_controller is
 
 begin
 
-	led_r <= recv_buf(9 downto 0);
 
 	sync_signals : process(clk) is
 	begin

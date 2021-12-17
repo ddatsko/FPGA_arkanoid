@@ -242,7 +242,7 @@ begin
 				end if;
 				
 			-- Process ball moving down
-			elsif (ball_moving_down and new_ball_y + BALL_LENGTH >= PADDING_TOP + 1 and new_ball_y + BALL_LENGTH <= PADDING_TOP + (BRICK_HEIGHT * (ROWS_NUM - 1)) + 1) then
+			elsif (ball_moving_down and new_ball_y + BALL_LENGTH >= PADDING_TOP + 1 and new_ball_y + BALL_LENGTH <= PADDING_TOP + (BRICK_HEIGHT * (ROWS_NUM)) + 1) then
 				if ((new_ball_y - PADDING_TOP) mod BRICK_HEIGHT = 1) then
 					if (bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)(new_ball_x / BRICK_WIDTH) = '1') then
 						bricks((new_ball_y + BALL_LENGTH - PADDING_TOP) / BRICK_HEIGHT)(new_ball_x / BRICK_WIDTH) <= '0';
